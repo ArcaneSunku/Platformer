@@ -3,9 +3,16 @@ package git.sunku;
 import git.sunku.engine.graphics.Rendering;
 import git.sunku.engine.graphics.Window;
 import git.sunku.entities.Entity;
+import git.sunku.tiles.Grass;
+import git.sunku.tiles.Tile;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+
+/**
+ * This class facilitates everything we need for a functioning game. </br>
+ * We have the Main Thread started here and this also hosts the game loop.
+ */
 
 public class Game implements Runnable {
     private final Window m_Window;
@@ -13,7 +20,7 @@ public class Game implements Runnable {
     private Handler m_Handler;
     private Thread m_Thread;
 
-    private Entity ent;
+    private Tile mGrass;
 
     private volatile boolean mv_Running;
 
@@ -21,6 +28,9 @@ public class Game implements Runnable {
         m_Window = new Window(title, width, height);
     }
 
+    /**
+     * A thread safe way to start off our game.
+     */
     public synchronized void start() {
         if(mv_Running) return;
 
@@ -29,6 +39,9 @@ public class Game implements Runnable {
         m_Thread.start();
     }
 
+    /**
+     * A thread safe way to stop the game.
+     */
     public synchronized void stop() {
         if(mv_Running) mv_Running = false;
 
@@ -42,6 +55,10 @@ public class Game implements Runnable {
         }
     }
 
+    /**
+     * Starts the Main Thread and also holds the Main Loop. </br>
+     * Holds the most important stuff.
+     */
     @Override
     public void run() {
         init();
@@ -96,25 +113,35 @@ public class Game implements Runnable {
         stop();
     }
 
+    /**
+     * Initializes everything we need to start the game. </br>
+     * This saves on performance in some ways.
+     */
     private void init() {
         Assets.init();
 
         m_Window.display();
         m_Handler = new Handler(this);
 
-        ent = new Entity("tiles");
+        mGrass = new Grass();
 
-        ent.x = 0;
-        ent.y = 0;
+        mGrass.x = 0;
+        mGrass.y = 0;
 
-        ent.width = 64;
-        ent.height = 64;
+        mGrass.width = 32;
+        mGrass.height = 32;
     }
 
+    /**
+     * Holds all of our logical updates for our game's components.
+     */
     private void update() {
-        ent.update();
+
     }
 
+    /**
+     * Facilitates the render updates for all of our game's components.
+     */
     private void render() {
         BufferStrategy strategy = m_Window.getBufferStrategy();
 
@@ -128,7 +155,7 @@ public class Game implements Runnable {
         graphics.fillRect(0, 0, getWidth(), getHeight());
         m_Handler.getRenderingGraphics(graphics);
 
-        ent.draw();
+        mGrass.draw();
 
         Rendering.setFont("vcr", 24f);
         Rendering.drawString(Color.blue, "Testing 123", 180, 180);

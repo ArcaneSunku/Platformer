@@ -1,8 +1,10 @@
 package git.sunku.tiles;
 
 import git.sunku.engine.graphics.textures.Texture;
+import git.sunku.engine.graphics.textures.TextureAtlas;
 
 public abstract class Tile {
+    private static final TextureAtlas tileAtlas = new TextureAtlas("tiles", 6, 20);
 
     protected Texture texture;
 
@@ -18,10 +20,25 @@ public abstract class Tile {
     }
 
     public void draw() {
-        texture.x = x;
-        texture.y = y;
+        if(texture.x != x)
+            texture.x = x;
+
+        if(texture.y != y)
+            texture.y = y;
+
+        if(texture.width != width)
+            texture.width = width;
+
+        if(texture.height != height)
+            texture.height = height;
 
         texture.draw();
+    }
+
+    public abstract boolean isSolid();
+
+    protected static Texture getFromAtlas(int row, int column) {
+        return tileAtlas.getTexture(row, column);
     }
 
 }
