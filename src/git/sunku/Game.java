@@ -2,11 +2,14 @@ package git.sunku;
 
 import git.sunku.engine.graphics.Rendering;
 import git.sunku.engine.graphics.Window;
+import git.sunku.engine.input.Keyboard;
+import git.sunku.engine.input.Mouse;
 import git.sunku.entities.Entity;
 import git.sunku.tiles.Grass;
 import git.sunku.tiles.Tile;
 
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferStrategy;
 
 /**
@@ -18,6 +21,8 @@ public class Game implements Runnable {
     private final Window m_Window;
 
     private Handler m_Handler;
+    private Keyboard m_Keyboard;
+    private Mouse m_Mouse;
     private Thread m_Thread;
 
     private Tile mGrass;
@@ -121,6 +126,8 @@ public class Game implements Runnable {
         Assets.init();
 
         m_Window.display();
+        m_Keyboard = new Keyboard(m_Window);
+        m_Mouse = new Mouse(m_Window);
         m_Handler = new Handler(this);
 
         mGrass = new Grass();
@@ -136,7 +143,8 @@ public class Game implements Runnable {
      * Holds all of our logical updates for our game's components.
      */
     private void update() {
-
+        m_Keyboard.update();
+        m_Mouse.update();
     }
 
     /**

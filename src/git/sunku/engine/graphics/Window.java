@@ -80,7 +80,7 @@ public class Window extends Canvas {
 
     public void display() {
         m_Frame.setVisible(true);
-        m_Frame.setVisible(true);
+        m_Frame.setFocusable(true);
 
         setFocusable(true);
         requestFocus();
