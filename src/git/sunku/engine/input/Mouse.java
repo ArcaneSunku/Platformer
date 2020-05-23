@@ -4,8 +4,11 @@ import git.sunku.engine.graphics.Window;
 
 import java.awt.event.*;
 
+/**
+ * Handles everything related to Mouse-centered input.
+ */
 public class Mouse implements MouseListener, MouseMotionListener, MouseWheelListener {
-    private static final int MAX_BUTTONS = 10;
+    private static final int MAX_BUTTONS = 20;
 
     private static boolean[] clicked, cantClick, justClicked;
 
@@ -19,6 +22,9 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
         window.addMouseWheelListener(this);
     }
 
+    /**
+     * Updates all the buttons so we can check for more specific button presses.
+     */
     public void update() {
         for(int i = 0; i < MAX_BUTTONS; i++) {
             if(cantClick[i] && !clicked[i]) {
@@ -44,7 +50,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
 
     @Override
     public void mousePressed(MouseEvent e) {
-        if(e.getButton() < 0 || e.getButton() > MAX_BUTTONS)
+        if(e.getButton() < 0 || e.getButton() >  MAX_BUTTONS + 214)
             return;
 
         clicked[e.getButton()] = true;
@@ -52,7 +58,7 @@ public class Mouse implements MouseListener, MouseMotionListener, MouseWheelList
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        if(e.getButton() < 0 || e.getButton() > MAX_BUTTONS)
+        if(e.getButton() < 0 || e.getButton() > MAX_BUTTONS + 214)
             return;
 
         clicked[e.getButton()] = false;

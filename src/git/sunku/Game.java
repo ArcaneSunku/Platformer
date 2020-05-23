@@ -2,10 +2,8 @@ package git.sunku;
 
 import git.sunku.engine.graphics.Rendering;
 import git.sunku.engine.graphics.Window;
+import git.sunku.engine.input.Input;
 import git.sunku.engine.input.Keyboard;
-import git.sunku.engine.input.Mouse;
-import git.sunku.entities.Entity;
-import git.sunku.tiles.Grass;
 import git.sunku.tiles.Tile;
 
 import java.awt.*;
@@ -21,8 +19,7 @@ public class Game implements Runnable {
     private final Window m_Window;
 
     private Handler m_Handler;
-    private Keyboard m_Keyboard;
-    private Mouse m_Mouse;
+    private Input m_Input;
     private Thread m_Thread;
 
     private Tile mGrass;
@@ -74,7 +71,7 @@ public class Game implements Runnable {
 
         double tick_limit = 60.0D;
         double nanoseconds_per_update = 1e9 / tick_limit;
-        double delta = 0.0D;
+        double delta_time = 0.0D;
 
         boolean should_render = false;
 
@@ -83,22 +80,22 @@ public class Game implements Runnable {
                 mv_Running = false;
 
             long now = System.nanoTime();
-            delta += (now - last_time) / nanoseconds_per_update;
+            delta_time += (now - last_time) / nanoseconds_per_update;
             last_time = now;
 
-            while(delta >= 1) {
-                update();
+            while(delta_time >= 1) {
+                update(delta_time);
                 should_render = true;
 
                 updates++;
-                delta -= 1;
+                delta_time -= 1;
             }
 
-            try {
-                Thread.sleep(3);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+//            try {
+//                Thread.sleep(3);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
 
             if(should_render) {
                 render();
@@ -126,29 +123,26 @@ public class Game implements Runnable {
         Assets.init();
 
         m_Window.display();
-        m_Keyboard = new Keyboard(m_Window);
-        m_Mouse = new Mouse(m_Window);
+        m_Input = new Input(m_Window);
         m_Handler = new Handler(this);
-
-        mGrass = new Grass();
-
-        mGrass.x = 0;
-        mGrass.y = 0;
-
-        mGrass.width = 32;
-        mGrass.height = 32;
     }
 
     /**
      * Holds all of our logical updates for our game's components.
+     * @param deltaTime the time we'll use to keep consistencies in input and rendering
      */
-    private void update() {
-        m_Keyboard.update();
-        m_Mouse.update();
+    private void update(double deltaTime) {
+        m_Input.update();
+
+        if(Keyboard.justPressed(KeyEvent.VK_ESCAPE))
+            mv_Running = false;
+
+        if(Keyboard.justPressed(KeyEvent.VK_SPACE))
+            System.out.printf("%f%n", deltaTime);
     }
 
     /**
-     * Facilitates the render updates for all of our game's components.
+     * Facilitates the graphical updates for all of our game's components.
      */
     private void render() {
         BufferStrategy strategy = m_Window.getBufferStrategy();
@@ -162,8 +156,6 @@ public class Game implements Runnable {
         graphics.setColor(Color.BLACK);
         graphics.fillRect(0, 0, getWidth(), getHeight());
         m_Handler.getRenderingGraphics(graphics);
-
-        mGrass.draw();
 
         Rendering.setFont("vcr", 24f);
         Rendering.drawString(Color.blue, "Testing 123", 180, 180);

@@ -1,6 +1,7 @@
 package git.sunku.engine.graphics;
 
 import git.sunku.Assets;
+import git.sunku.engine.graphics.textures.Texture;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -15,6 +16,10 @@ public class Rendering {
 
     public void getGraphics2D(Graphics2D g2d) {
         m_Graphics2D = g2d;
+    }
+
+    public static void drawTexture(Texture texture) {
+        texture.draw();
     }
 
     public static void drawImage(BufferedImage image, float x, float y, int width, int height) {

@@ -5,6 +5,9 @@ import git.sunku.engine.graphics.Window;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+/**
+ * Handles everything related to Keyboard-centered input.
+ */
 public class Keyboard implements KeyListener {
     private static final int MAX_KEYS = 256;
 
@@ -18,6 +21,9 @@ public class Keyboard implements KeyListener {
         window.addKeyListener(this);
     }
 
+    /**
+     * Updates all the keys so we can check for more specific key presses. (ie half-press)
+     */
     public void update() {
         for(int i = 0; i < MAX_KEYS; i++) {
             if(cantPress[i] && !pressed[i]) {
