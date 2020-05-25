@@ -8,7 +8,6 @@ import java.awt.event.WindowListener;
 public class Window extends Canvas {
 
     private JFrame m_Frame;
-    private WindowListener m_Listener;
 
     private String m_Title;
     private int m_Width, m_Height;
@@ -32,7 +31,7 @@ public class Window extends Canvas {
         setMaximumSize(dimension);
         setPreferredSize(dimension);
 
-        m_Listener = new WindowListener() {
+        final WindowListener LISTENER = new WindowListener() {
             @Override
             public void windowOpened(WindowEvent e) {
             }
@@ -68,8 +67,6 @@ public class Window extends Canvas {
             }
         };
 
-        setFocusable(true);
-
         m_Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         m_Frame.setLayout(new BorderLayout());
         m_Frame.add(this, BorderLayout.CENTER);
@@ -80,10 +77,6 @@ public class Window extends Canvas {
 
     public void display() {
         m_Frame.setVisible(true);
-        m_Frame.setFocusable(true);
-
-        setFocusable(true);
-        requestFocus();
     }
 
     public void setTitle(String title) {
@@ -102,7 +95,9 @@ public class Window extends Canvas {
     public int getRefreshRate() {
         if(m_Frame != null) return 0;
 
-        return getGraphicsConfiguration().getDevice().getDisplayMode().getRefreshRate();
+        int rRate = getGraphicsConfiguration().getDevice().getDisplayMode().getRefreshRate();
+
+        return rRate == DisplayMode.REFRESH_RATE_UNKNOWN ? 60 : rRate;
     }
 
     public int width() { return m_Width; }

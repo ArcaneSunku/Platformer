@@ -1,11 +1,16 @@
 package git.sunku.engine.graphics;
 
 import git.sunku.Assets;
+import git.sunku.Handler;
 import git.sunku.engine.graphics.textures.Texture;
 import git.sunku.tiles.Tile;
 
-import java.awt.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Handles everything with the Main Rendering Thread's Graphics2D object. </br>
@@ -27,6 +32,12 @@ public class Renderer {
 
     public static void drawTile(Tile tile) {
         tile.draw();
+    }
+    public static void drawTiles(List<Tile> tiles) {
+        for(Tile t : tiles) {
+            if(Handler.gameBounds().intersects(t.x, t.y, t.width, t.height))
+                t.draw();
+        }
     }
 
     public static void drawTexture(Texture texture) {

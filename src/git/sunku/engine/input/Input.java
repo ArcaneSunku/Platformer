@@ -14,6 +14,9 @@ public class Input {
     public Input(Window window) {
         m_Keys = new Keyboard(window);
         m_Buttons = new Mouse(window);
+
+        window.setFocusable(true);
+        window.requestFocus();
     }
 
     public void update() {

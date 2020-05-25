@@ -2,6 +2,8 @@ package git.sunku.engine.scenes;
 
 public abstract class Scene {
 
+    protected final int UNIT = 32;
+
     protected final String SCENE_NAME;
 
     public Scene(String name) {

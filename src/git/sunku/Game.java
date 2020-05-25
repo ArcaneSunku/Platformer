@@ -4,8 +4,8 @@ import git.sunku.engine.graphics.Renderer;
 import git.sunku.engine.graphics.Window;
 import git.sunku.engine.input.Input;
 import git.sunku.engine.input.Keyboard;
-import git.sunku.tiles.Grass;
-import git.sunku.tiles.Tile;
+import git.sunku.engine.scenes.MainScene;
+import git.sunku.engine.scenes.SceneManager;
 
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -23,7 +23,7 @@ public class Game implements Runnable {
     private Input m_Input;
     private Thread m_Thread;
 
-    private Tile m_Grass;
+    private SceneManager m_SceneManager;
 
     private String m_ShowFPS;
 
@@ -39,7 +39,7 @@ public class Game implements Runnable {
      * A thread safe way to start off our game.
      */
     public synchronized void start() {
-        if(mv_Running) return;
+        if (mv_Running) return;
 
         m_Thread = new Thread(this, "Game_Thread");
         mv_Running = true;
@@ -50,7 +50,7 @@ public class Game implements Runnable {
      * A thread safe way to stop the game.
      */
     public synchronized void stop() {
-        if(mv_Running) mv_Running = false;
+        if (mv_Running) mv_Running = false;
 
         try {
             m_Window.dispose();
@@ -70,10 +70,9 @@ public class Game implements Runnable {
     public void run() {
         init();
 
-        int frames_per_second = m_Window.getRefreshRate();
+        double frames_per_second = m_Window.getRefreshRate() == 0 ? 60 : m_Window.getRefreshRate();
         int frame_count = 0, frame_tick = 0;
 
-        long current_time;
         long last_time = System.nanoTime();
 
         double total_time = 0.0;
@@ -81,22 +80,23 @@ public class Game implements Runnable {
 
         boolean should_render = false;
 
-        final double NANOSECONDS = 1e9;
-        final double DELTA = 1 / (double) frames_per_second;
+        final double NANOSECONDS = 1e9 / frames_per_second;
 
-        while(mv_Running) {
-            if(m_Window.hasClosed() || m_Window.isClosing())
+        while (mv_Running) {
+            if (m_Window.hasClosed() || m_Window.isClosing())
                 mv_Running = false;
 
-            current_time = System.nanoTime();
-            frame_time += current_time - last_time;
-            total_time += (double) (current_time - last_time) / NANOSECONDS;
+            long current_time = System.nanoTime();
+            frame_time += (current_time - last_time) / NANOSECONDS;
+            total_time += frame_time;
             last_time = current_time;
 
-            while(frame_time >= DELTA * NANOSECONDS) {
-                update(DELTA);
-                frame_time -= DELTA * NANOSECONDS;
+            while (frame_time >= 1) {
+                m_Input.update();
+                update(frame_time);
                 should_render = true;
+
+                frame_time -= 1;
             }
 
             // Old Delta timer
@@ -116,27 +116,25 @@ public class Game implements Runnable {
 
             // we make sure we are rendering at least twice so there is no tearing
 
-            if(should_render) {
+            if (should_render) {
                 render();
+                frame_count++;
                 should_render = false;
             }
 
             render();
+            frame_count++;
 
-            if(m_DisplayFPS) {
-                frame_count++;
-                frame_tick += total_time;
+            frame_tick += total_time;
 
-                if(frame_tick >= 1) {
-
-                    m_ShowFPS = String.format("FPS: %d, Avg Frame: %.2fms", frame_count, (total_time / frame_count * 1000));
+            if (frame_tick >= 1) {
+                m_ShowFPS = String.format("%-1s  %.2f, Avg Frame: %dms", "FPS:", (total_time / frame_count * 1000), frame_count);
 
 //                    System.out.printf (m_ShowFPS);
 
-                    frame_tick -= 1;
-                    frame_count = 0;
-                    total_time = 0;
-                }
+                frame_tick -= 1;
+                frame_count = 0;
+                total_time = 0;
             }
 
         }
@@ -150,36 +148,29 @@ public class Game implements Runnable {
      */
     private void init() {
         Assets.init();
+        m_SceneManager = new SceneManager();
+        m_Handler = new Handler(this);
 
         m_Window.display();
         m_Input = new Input(m_Window);
-        m_Handler = new Handler(this);
 
-        m_ShowFPS = String.format("FPS: %d, Avg Frame: %.2fms", 0, 0.00f);
+        m_DisplayFPS = false;
+        m_ShowFPS = String.format("%1$-10sFPS:  %d, Avg Frame: %.2fms", 0, 0.00f);
 
-        m_DisplayFPS = true;
-
-        m_Grass = new Grass();
-
-        m_Grass.x = 0;
-        m_Grass.y = 0;
-
-        m_Grass.width = 32;
-        m_Grass.height = 32;
+        Handler.addScene(new MainScene());
+        Handler.setScene("MainScene");
     }
 
     /**
      * Holds all of our logical updates for our game's components.
+     *
      * @param deltaTime the time we'll use to keep consistencies in input and rendering
      */
     private void update(double deltaTime) {
-        m_Input.update();
+        if(Keyboard.justPressed(KeyEvent.VK_F1))
+            m_DisplayFPS = !m_DisplayFPS;
 
-        if(Keyboard.isPressed(KeyEvent.VK_D))
-            m_Grass.x += m_Grass.width * deltaTime;
-
-        if(Keyboard.justPressed(KeyEvent.VK_ESCAPE))
-            mv_Running = false;
+        m_SceneManager.update(deltaTime);
     }
 
     /**
@@ -188,7 +179,7 @@ public class Game implements Runnable {
     private void render() {
         BufferStrategy strategy = m_Window.getBufferStrategy();
 
-        if(strategy == null) {
+        if (strategy == null) {
             m_Window.createBufferStrategy(2);
             return;
         }
@@ -196,16 +187,22 @@ public class Game implements Runnable {
         Graphics graphics = strategy.getDrawGraphics();
         graphics.setColor(Color.BLACK);
         graphics.fillRect(0, 0, getWidth(), getHeight());
-        m_Handler.getRenderingGraphics(graphics);
 
-        Renderer.drawTile(m_Grass);
+        m_Handler.setRenderingGraphics(graphics);
+        m_SceneManager.render();
 
         Renderer.setFont("vcr", 16f);
-        final int fps_x = m_Window.getWidth() - Renderer.stringWidth(Renderer.getFont(), m_ShowFPS);
-        Renderer.drawString(Color.blue, m_ShowFPS, fps_x, 20);
+        if(m_DisplayFPS) {
+            final int fps_x = m_Window.getWidth() - Renderer.stringWidth(Renderer.getFont(), m_ShowFPS);
+            Renderer.drawString(Color.blue, m_ShowFPS, fps_x, 20);
+        }
 
         graphics.dispose();
         strategy.show();
+    }
+
+    public SceneManager getSceneManager() {
+        return m_SceneManager;
     }
 
     public int getWidth() {

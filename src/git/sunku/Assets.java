@@ -31,10 +31,27 @@ public class Assets {
         return Assets.class.getResource(String.format("/audio/%s.ogg", ogg));
     }
 
+    public static void putImage(String name, BufferedImage image) { m_ImageCache.putIfAbsent(name, image); }
+
     public static BufferedImage getImage(String imageName) { return m_ImageCache.get(imageName); }
 
     public static Font getFont(String fontName, float size) { return getFont(fontName, Font.PLAIN, size); }
     public static Font getFont(String fontName, int style, float size) { return m_FontCache.get(fontName).deriveFont(style, size); }
+
+    public static boolean inCache(Object obj) {
+        if(obj instanceof BufferedImage) {
+            final BufferedImage img = (BufferedImage) obj;
+            return m_ImageCache.containsKey(img);
+        }else if(obj instanceof Font) {
+            final Font fnt = (Font) obj;
+            return m_FontCache.containsKey(fnt);
+        } else if(obj instanceof Ogg) {
+            final Ogg ogg = (Ogg) obj;
+            return m_OggCache.containsKey(ogg);
+        }
+
+        return false;
+    }
 
     public static Ogg getOgg(String oggName) { return m_OggCache.get(oggName); }
 

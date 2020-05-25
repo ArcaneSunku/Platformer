@@ -1,5 +1,6 @@
 package git.sunku.tiles;
 
+import git.sunku.Assets;
 import git.sunku.engine.graphics.textures.Texture;
 import git.sunku.engine.graphics.textures.TextureAtlas;
 
