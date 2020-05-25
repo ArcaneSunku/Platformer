@@ -4,6 +4,7 @@ import git.sunku.engine.graphics.Rendering;
 import git.sunku.engine.graphics.Window;
 import git.sunku.engine.input.Input;
 import git.sunku.engine.input.Keyboard;
+import git.sunku.tiles.Grass;
 import git.sunku.tiles.Tile;
 
 import java.awt.*;
@@ -23,6 +24,8 @@ public class Game implements Runnable {
     private Thread m_Thread;
 
     private Tile mGrass;
+
+    private boolean m_DisplayFPS;
 
     private volatile boolean mv_Running;
 
@@ -65,51 +68,61 @@ public class Game implements Runnable {
     public void run() {
         init();
 
-        int updates = 0, frames = 0;
+        int frames_per_second = 60;
+        int frame_count = 0, frame_tick = 0;
+
+        long current_time;
         long last_time = System.nanoTime();
-        long timer = System.currentTimeMillis();
 
-        double tick_limit = 60.0D;
-        double nanoseconds_per_update = 1e9 / tick_limit;
-        double delta_time = 0.0D;
+        double total_time = 0.0;
+        double frame_time = 0.0;
 
-        boolean should_render = false;
+        final double nanoseconds = 1e9;
+        final double delta = 1 / (double) frames_per_second;
 
         while(mv_Running) {
             if(m_Window.hasClosed() || m_Window.isClosing())
                 mv_Running = false;
 
-            long now = System.nanoTime();
-            delta_time += (now - last_time) / nanoseconds_per_update;
-            last_time = now;
+            current_time = System.nanoTime();
+            frame_time += current_time - last_time;
+            total_time += (double) (current_time - last_time) / nanoseconds;
+            last_time = current_time;
 
-            while(delta_time >= 1) {
-                update(delta_time);
-                should_render = true;
-
-                updates++;
-                delta_time -= 1;
+            while(frame_time >= delta * nanoseconds) {
+                update(delta);
+                frame_time -= delta * nanoseconds;
             }
 
+//            while(delta >= 1) {
+//                update(delta);
+//                should_render = true;
+//
+//                updates++;
+//                delta -= 1;
+//            }
+
 //            try {
-//                Thread.sleep(3);
+//                Thread.sleep(2);
 //            } catch (InterruptedException e) {
 //                e.printStackTrace();
 //            }
 
-            if(should_render) {
-                render();
-                frames++;
-                should_render = false;
+            render();
+
+            if(m_DisplayFPS) {
+                frame_count++;
+                frame_tick += total_time;
+
+                if(frame_tick >= 1) {
+                    System.out.printf("FPS: %d, Avg Frame: %.2fms%n", frame_count, (total_time / frame_count * 1000));
+
+                    frame_count = 0;
+                    frame_tick -= 1;
+                    total_time = 0;
+                }
             }
 
-            if(System.currentTimeMillis() - timer > 1000) {
-                System.out.printf("%d updates, %d frames%n", updates, frames);
-
-                timer+= 1000;
-                updates = 0;
-                frames = 0;
-            }
         }
 
         stop();
@@ -125,6 +138,16 @@ public class Game implements Runnable {
         m_Window.display();
         m_Input = new Input(m_Window);
         m_Handler = new Handler(this);
+
+        m_DisplayFPS = false;
+
+        mGrass = new Grass();
+
+        mGrass.x = 0;
+        mGrass.y = 0;
+
+        mGrass.width = 32;
+        mGrass.height = 32;
     }
 
     /**
@@ -134,11 +157,14 @@ public class Game implements Runnable {
     private void update(double deltaTime) {
         m_Input.update();
 
+        if(Keyboard.isPressed(KeyEvent.VK_D))
+            mGrass.x += 40f * deltaTime;
+
         if(Keyboard.justPressed(KeyEvent.VK_ESCAPE))
             mv_Running = false;
 
         if(Keyboard.justPressed(KeyEvent.VK_SPACE))
-            System.out.printf("%f%n", deltaTime);
+            m_DisplayFPS = !m_DisplayFPS;
     }
 
     /**
@@ -148,7 +174,7 @@ public class Game implements Runnable {
         BufferStrategy strategy = m_Window.getBufferStrategy();
 
         if(strategy == null) {
-            m_Window.createBufferStrategy(2);
+            m_Window.createBufferStrategy(3);
             return;
         }
 
@@ -156,6 +182,8 @@ public class Game implements Runnable {
         graphics.setColor(Color.BLACK);
         graphics.fillRect(0, 0, getWidth(), getHeight());
         m_Handler.getRenderingGraphics(graphics);
+
+        mGrass.draw();
 
         Rendering.setFont("vcr", 24f);
         Rendering.drawString(Color.blue, "Testing 123", 180, 180);
