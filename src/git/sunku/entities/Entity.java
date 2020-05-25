@@ -1,6 +1,6 @@
 package git.sunku.entities;
 
-import git.sunku.engine.graphics.Rendering;
+import git.sunku.engine.graphics.Renderer;
 import git.sunku.engine.graphics.textures.TextureAtlas;
 
 public class Entity {
@@ -20,7 +20,7 @@ public class Entity {
 
     public void draw() {
         if(texture != null) {
-            Rendering.drawImage(texture.getImage(2, 0), x, y, width, height);
+            Renderer.drawImage(texture.getImage(2, 0), x, y, width, height);
         }
     }
 

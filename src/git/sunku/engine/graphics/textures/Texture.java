@@ -1,8 +1,7 @@
 package git.sunku.engine.graphics.textures;
 
 import git.sunku.Assets;
-import git.sunku.Handler;
-import git.sunku.engine.graphics.Rendering;
+import git.sunku.engine.graphics.Renderer;
 
 import java.awt.image.BufferedImage;
 
@@ -28,7 +27,7 @@ public class Texture {
     }
 
     public void draw() {
-        Rendering.drawImage(m_Image, (int) x, (int) y, width, height);
+        Renderer.drawImage(m_Image, (int) x, (int) y, width, height);
     }
 
 }

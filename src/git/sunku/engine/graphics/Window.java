@@ -99,6 +99,12 @@ public class Window extends Canvas {
 
     public String title() { return m_Title; }
 
+    public int getRefreshRate() {
+        if(m_Frame != null) return 0;
+
+        return getGraphicsConfiguration().getDevice().getDisplayMode().getRefreshRate();
+    }
+
     public int width() { return m_Width; }
     public int height() { return m_Height; }
 

@@ -1,7 +1,6 @@
 package git.sunku.engine.graphics.textures;
 
 import git.sunku.Assets;
-import git.sunku.engine.graphics.Rendering;
 
 import java.awt.image.BufferedImage;
 
