@@ -20,6 +20,7 @@ public class Assets {
         m_OggCache = Cache.newInstance(10);
 
         m_ImageCache.put("stick", Loader.loadImage("stick.png"));
+        m_ImageCache.put("slime", Loader.loadImage("slime.png"));
         m_ImageCache.put("tiles", Loader.loadImage("tiles.png"));
 
         m_FontCache.put("vcr", Loader.loadTTF("vcr.ttf"));

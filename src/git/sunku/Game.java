@@ -32,7 +32,7 @@ public class Game implements Runnable {
     private volatile boolean mv_Running;
 
     public Game(String title, int width, int height) {
-        m_Window = new Window(title, width, height);
+        m_Window = new Window(title + " | F1: Display FPS", width, height);
     }
 
     /**
@@ -128,9 +128,7 @@ public class Game implements Runnable {
             frame_tick += total_time;
 
             if (frame_tick >= 1) {
-                m_ShowFPS = String.format("%-1s  %.2f, Avg Frame: %dms", "FPS:", (total_time / frame_count * 1000), frame_count);
-
-//                    System.out.printf (m_ShowFPS);
+                m_ShowFPS = String.format("%-1s %.2f, Avg Frame: %dms", "FPS:", (total_time / frame_count * 1000), frame_count);
 
                 frame_tick -= 1;
                 frame_count = 0;
@@ -155,7 +153,7 @@ public class Game implements Runnable {
         m_Input = new Input(m_Window);
 
         m_DisplayFPS = false;
-        m_ShowFPS = String.format("%1$-10sFPS:  %d, Avg Frame: %.2fms", 0, 0.00f);
+        m_ShowFPS = String.format("%-1s %d, Avg Frame: %.2fms", "FPS:", 0, 0.00f);
 
         Handler.addScene(new MainScene());
         Handler.setScene("MainScene");
@@ -191,10 +189,11 @@ public class Game implements Runnable {
         m_Handler.setRenderingGraphics(graphics);
         m_SceneManager.render();
 
-        Renderer.setFont("vcr", 16f);
-        if(m_DisplayFPS) {
+        if(m_DisplayFPS) { // FPS Renderer
+            Renderer.setFont("vcr", Font.BOLD, 18f);
             final int fps_x = m_Window.getWidth() - Renderer.stringWidth(Renderer.getFont(), m_ShowFPS);
-            Renderer.drawString(Color.blue, m_ShowFPS, fps_x, 20);
+            Renderer.drawString(Color.white, m_ShowFPS, fps_x - 2, 20); // white shadow
+            Renderer.drawString(Color.blue, m_ShowFPS, fps_x, 20); // blue font
         }
 
         graphics.dispose();

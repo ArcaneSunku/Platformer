@@ -8,6 +8,8 @@ import java.awt.*;
 
 public class Handler {
 
+    public static int UNIT = 32;
+
     private static Game m_Game;
     private static Rectangle m_GameBounds;
     private final Renderer m_Renderer;

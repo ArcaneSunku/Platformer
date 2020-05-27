@@ -3,6 +3,7 @@ package git.sunku.engine.graphics;
 import git.sunku.Assets;
 import git.sunku.Handler;
 import git.sunku.engine.graphics.textures.Texture;
+import git.sunku.entities.Entity;
 import git.sunku.tiles.Tile;
 
 import java.awt.Color;
@@ -28,6 +29,16 @@ public class Renderer {
 
     public void getGraphics2D(Graphics2D g2d) {
         m_Graphics2D = g2d;
+    }
+
+    public static void drawEntity(Entity entity) {
+        entity.draw();
+    }
+    public static void drawEntities(List<Entity> entities) {
+        for(Entity entity : entities) {
+            if(Handler.gameBounds().intersects(entity.x, entity.y, entity.width, entity.height))
+                entity.draw();
+        }
     }
 
     public static void drawTile(Tile tile) {

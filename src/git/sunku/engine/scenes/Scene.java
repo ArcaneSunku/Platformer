@@ -2,8 +2,6 @@ package git.sunku.engine.scenes;
 
 public abstract class Scene {
 
-    protected final int UNIT = 32;
-
     protected final String SCENE_NAME;
 
     public Scene(String name) {
@@ -11,7 +9,7 @@ public abstract class Scene {
     }
 
     public abstract void prepare();
-    public abstract void update(double dt);
+    public abstract void update(double deltaTime);
     public abstract void render();
 
     public String getName() { return SCENE_NAME; }

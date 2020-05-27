@@ -1,15 +1,23 @@
 package git.sunku.engine.scenes;
 
+import git.sunku.Handler;
 import git.sunku.engine.graphics.Renderer;
+import git.sunku.entities.Entity;
+import git.sunku.entities.Player;
+import git.sunku.tiles.Dirt;
 import git.sunku.tiles.Grass;
+import git.sunku.tiles.Sand;
 import git.sunku.tiles.Tile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class MainScene extends Scene {
 
     private List<Tile> m_Tiles;
+
+    private Entity m_Player;
 
     public MainScene() {
         super("MainScene");
@@ -17,30 +25,53 @@ public class MainScene extends Scene {
 
     @Override
     public void prepare() {
-        System.out.println("PREPARING MAIN");
-        m_Tiles = new ArrayList<>();
+        System.out.println("PREPARING SCENE");
 
-        for(int x = 0; x < 300; x++) {
-            for(int y = 0; y < 300; y++) {
-                Tile tile = new Grass();
+        System.out.println("PREPARING THE LEVEL");
+        m_Tiles = new ArrayList<Tile>();
 
-                tile.x = x * UNIT;
-                tile.y = y * UNIT;
-                tile.width = UNIT;
-                tile.height = UNIT;
+        for(int lvlWidth = 0; lvlWidth < 15; lvlWidth++) {
+            for(int lvlHeight = 0; lvlHeight < 15; lvlHeight++) {
+                Tile t = null;
 
-                m_Tiles.add(tile);
+                switch(ThreadLocalRandom.current().nextInt(1, 4)) {
+                    case 1:
+                        t = new Grass();
+                        break;
+                    case 2:
+                        t = new Dirt();
+                        break;
+                    case 3:
+                        t = new Sand();
+                        break;
+                    default:
+                        throw new IllegalStateException("We shouldn't be here...");
+                }
+
+                t.x = lvlWidth * Handler.UNIT;
+                t.y = lvlHeight * Handler.UNIT;
+
+                t.width = Handler.UNIT;
+                t.height = Handler.UNIT;
+
+                m_Tiles.add(t);
             }
         }
+
+        System.out.println("INSERTING THE PLAYER");
+        m_Player = new Player();
+
+        System.out.println("FINISHED PREPARING");
     }
 
     @Override
-    public void update(double dt) {
-
+    public void update(double deltaTime) {
+        m_Player.update(deltaTime);
     }
 
     @Override
     public void render() {
         Renderer.drawTiles(m_Tiles);
+        Renderer.drawEntity(m_Player);
     }
 }
