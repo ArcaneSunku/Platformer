@@ -4,6 +4,8 @@ import git.sunku.Handler;
 import git.sunku.engine.graphics.Renderer;
 import git.sunku.entities.Entity;
 import git.sunku.entities.Player;
+import git.sunku.levels.Level;
+import git.sunku.levels.TestLevel;
 import git.sunku.tiles.Dirt;
 import git.sunku.tiles.Grass;
 import git.sunku.tiles.Sand;
@@ -19,6 +21,8 @@ public class MainScene extends Scene {
 
     private Entity m_Player;
 
+    private Level m_Test;
+
     public MainScene() {
         super("MainScene");
     }
@@ -28,35 +32,38 @@ public class MainScene extends Scene {
         System.out.println("PREPARING SCENE");
 
         System.out.println("PREPARING THE LEVEL");
-        m_Tiles = new ArrayList<Tile>();
+//        m_Tiles = new ArrayList<Tile>();
+//
+//        for(int lvlWidth = 0; lvlWidth < 15; lvlWidth++) {
+//            for(int lvlHeight = 0; lvlHeight < 15; lvlHeight++) {
+//                Tile t = null;
+//
+//                switch(ThreadLocalRandom.current().nextInt(1, 4)) {
+//                    case 1:
+//                        t = new Grass();
+//                        break;
+//                    case 2:
+//                        t = new Dirt();
+//                        break;
+//                    case 3:
+//                        t = new Sand();
+//                        break;
+//                    default:
+//                        throw new IllegalStateException("We shouldn't be here...");
+//                }
+//
+//                t.x = lvlWidth * Handler.UNIT;
+//                t.y = lvlHeight * Handler.UNIT;
+//
+//                t.width = Handler.UNIT;
+//                t.height = Handler.UNIT;
+//
+//                m_Tiles.add(t);
+//            }
+//        }
 
-        for(int lvlWidth = 0; lvlWidth < 15; lvlWidth++) {
-            for(int lvlHeight = 0; lvlHeight < 15; lvlHeight++) {
-                Tile t = null;
-
-                switch(ThreadLocalRandom.current().nextInt(1, 4)) {
-                    case 1:
-                        t = new Grass();
-                        break;
-                    case 2:
-                        t = new Dirt();
-                        break;
-                    case 3:
-                        t = new Sand();
-                        break;
-                    default:
-                        throw new IllegalStateException("We shouldn't be here...");
-                }
-
-                t.x = lvlWidth * Handler.UNIT;
-                t.y = lvlHeight * Handler.UNIT;
-
-                t.width = Handler.UNIT;
-                t.height = Handler.UNIT;
-
-                m_Tiles.add(t);
-            }
-        }
+        m_Test = new TestLevel();
+        m_Test.initialize();
 
         System.out.println("INSERTING THE PLAYER");
         m_Player = new Player();
@@ -67,11 +74,12 @@ public class MainScene extends Scene {
     @Override
     public void update(double deltaTime) {
         m_Player.update(deltaTime);
+        m_Test.update(deltaTime);
     }
 
     @Override
     public void render() {
-        Renderer.drawTiles(m_Tiles);
+        m_Test.render();
         Renderer.drawEntity(m_Player);
     }
 }

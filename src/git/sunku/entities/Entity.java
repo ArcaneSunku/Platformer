@@ -9,11 +9,12 @@ import java.awt.geom.Rectangle2D;
 public class Entity {
 
     protected TextureAtlas texture;
-
     protected String name;
 
-    // Helps us explore the Atlas for animation esque behavior
+    protected int health;
     protected int dir, frame;
+
+    protected boolean walking, dead;
 
     // Positional and Velocity variables
     public float x, y;
@@ -24,11 +25,18 @@ public class Entity {
 
     public Entity(String name, String atlas, int rows, int columns) {
         texture = new TextureAtlas(atlas, rows, columns);
+
+        health = 25;
         dir = 0;
         frame = 0;
+
+        walking = false;
     }
 
     public void update(double deltaTime) {
+        if(height <= 0)
+            dead = true;
+
         if(xVel > 5f)
             xVel = 3.5f;
         if(xVel < -5f)
@@ -51,5 +59,7 @@ public class Entity {
     }
 
     public String getName() { return name; }
+
+    public boolean isAlive() { return !dead; }
 
 }
